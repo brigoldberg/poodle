@@ -1,15 +1,16 @@
 # universe.py
+import locale
 import os
 import sys
 import toml
 from .stock import Stock
 from .utils import iterate_basket, read_config
 from .applogger import get_logger
-
+locale.setlocale(locale.LC_ALL, 'en_US')
 
 class Universe:
     """
-    Create a 'baslket'  of Stock object from list of symbols.
+    Create a 'basket'  of Stock object from list of symbols.
     """
     def __init__(self, symbol_list, *args, **kwargs):
 
@@ -35,3 +36,19 @@ class Universe:
     @iterate_basket
     def set_date_range(self, stock_obj, date_start, date_end):
         stock_obj.snip_dates(date_start, date_end)
+
+    def get_basket_pnl(self, date_end):
+        universe_pnl = 0
+        for symbol,stock_obj in self.stocks.items():
+            symbol_pnl = stock_obj.get_book_pnl(date_end)
+            universe_pnl = universe_pnl + symbol_pnl
+            self.logger.info(f'{symbol} {symbol_pnl}')
+
+        #print(f"${locale.currency(universe_pnl, grouping=True)}")
+        print(f"${locale.format_string('%.2f', universe_pnl, True)}")
+
+    def get_basket_sharpe(self, stock_obj, date_end):
+        pass
+
+    def plot_basket_pnl(self, stock_obj, date_end):
+        pass

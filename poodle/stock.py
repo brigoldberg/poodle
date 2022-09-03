@@ -63,6 +63,7 @@ class Stock:
         self.signal    = self.signal.loc[date_start:date_end]
         self.trade_log = self.trade_log.loc[date_start:date_end]
         self.logger.info(f'{self.symbol.upper()}: pruned dates {date_start} to {date_end}')            
+
     def log_trade(self, trade_date, shares, price):
         if trade_date not in self.trade_log.index:
             raise Exception(f'{trade_date} not in time series')
@@ -83,8 +84,11 @@ class Stock:
         self.logger.info(f'{self.symbol.upper()}: book cost ${book_cost:0.2f}')
         return book_cost
 
-    def get_book_pnl(self, trade_date):
+    def get_book_pnl(self, trade_date, pretty=False):
         """ Return PnL of all trades up to submitted trade date """
         book_pnl = self.get_book_value(trade_date) - self.get_book_cost(trade_date)
         self.logger.info(f'{self.symbol.upper()}: book PnL ${book_pnl:0.2f}')
-        return book_pnl
+        if pretty == False:
+            return book_pnl
+        else:
+            print(f"${locale.format_string('%.2f', book_pnl)}")
